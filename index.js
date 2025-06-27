@@ -16,7 +16,7 @@ async function fetchPage(page = 1) {
     });
 
     const $ = cheerio.load(data);
-    const rows = [];
+    const rows = []; ////
 
     $('table.table-hover tbody tr').each((i, el) => {
         const columns = $(el).find('th');
