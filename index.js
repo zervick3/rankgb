@@ -50,13 +50,19 @@ async function getTotalPages() {
 app.get('/api/ranking', async (req, res) => {
     try {
         const totalPages = await getTotalPages();
-        const allData = [];
+        console.log(`📄 Total de páginas: ${totalPages}`);
 
+        // Crear todas las promesas de fetchPage en paralelo
+        const pagePromises = [];
         for (let page = 1; page <= totalPages; page++) {
-            console.log(`🔄 Scrapeando página ${page}...`);
-            const pageData = await fetchPage(page);
-            allData.push(...pageData);
+            pagePromises.push(fetchPage(page));
         }
+
+        // Esperar a que todas las páginas se scrapen en paralelo
+        const allPages = await Promise.all(pagePromises);
+
+        // Aplanar los arrays de cada página en uno solo
+        const allData = allPages.flat();
 
         res.json(allData);
     } catch (err) {
