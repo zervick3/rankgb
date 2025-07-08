@@ -16,7 +16,7 @@ async function fetchPage(page = 1) {
     });
 
     const $ = cheerio.load(data);
-    const rows = []; ////
+    const rows = [];
 
     $('table.table-hover tbody tr').each((i, el) => {
         const columns = $(el).find('th');
@@ -41,7 +41,7 @@ async function getTotalPages() {
     const pageLinks = $('ul.pagination li a.page-link')
         .map((i, el) => $(el).text().trim())
         .get()
-        .filter(text => /^\d+$/.test(text)) // solo números
+        .filter(text => /^\d+$/.test(text))
         .map(Number);
 
     return Math.max(...pageLinks);
@@ -65,6 +65,35 @@ app.get('/api/ranking', async (req, res) => {
     }
 });
 
+// Nuevo endpoint para scrapear noticias
+app.get('/api/news', async (req, res) => {
+    try {
+        const { data } = await axios.get('https://gunboundggh.com/news/EN', {
+            headers: {
+                'User-Agent': 'Mozilla/5.0',
+                'Cache-Control': 'no-cache',
+            },
+        });
+        const $ = cheerio.load(data);
+        const news = [];
+
+        $('.gb-sc-news-wrapper').each((i, el) => {
+            news.push({
+                url: $(el).attr('href'),
+                image: $(el).find('img').attr('src'),
+                title: $(el).find('.gb-sc-news-title').text().trim(),
+                description: $(el).find('p').text().trim(),
+            });
+        });
+
+        res.json(news);
+    } catch (err) {
+        console.error('❌ Error:', err.message);
+        res.status(500).json({ error: 'Error al scrapear noticias', message: err.message });
+    }
+});
+
 app.listen(3000, () => {
     console.log('🚀 API corriendo en http://localhost:3000/api/ranking');
+    console.log('📰 Endpoint de noticias en http://localhost:3000/api/news');
 });
