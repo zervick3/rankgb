@@ -2,10 +2,12 @@ const express = require('express');
 const axios = require('axios');
 const cheerio = require('cheerio');
 const cors = require('cors');
+const fetch = require('node-fetch');
 
 const app = express();
 app.use(cors());
 
+// Scraping del ranking
 async function fetchPage(page = 1) {
     const url = `https://gunboundggh.com/rank/EN?page=${page}`;
     const { data } = await axios.get(url, {
@@ -71,7 +73,7 @@ app.get('/api/ranking', async (req, res) => {
     }
 });
 
-// Nuevo endpoint para scrapear noticias
+// Scraping de noticias
 app.get('/api/news', async (req, res) => {
     try {
         const { data } = await axios.get('https://gunboundggh.com/news/EN', {
@@ -99,7 +101,41 @@ app.get('/api/news', async (req, res) => {
     }
 });
 
+// Envío de notificaciones push con Expo
+async function sendPushNotification(expoPushToken, title, body) {
+    await fetch('https://exp.host/--/api/v2/push/send', {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Accept-encoding': 'gzip, deflate',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            to: expoPushToken,
+            sound: 'default',
+            title,
+            body,
+        }),
+    });
+}
+
+// Endpoint para enviar notificaciones push
+app.post('/api/send-notification', express.json(), async (req, res) => {
+    const { expoPushToken, title, body } = req.body;
+    if (!expoPushToken || !title || !body) {
+        return res.status(400).json({ error: 'Faltan parámetros' });
+    }
+    try {
+        await sendPushNotification(expoPushToken, title, body);
+        res.json({ success: true });
+    } catch (err) {
+        console.error('❌ Error al enviar notificación:', err.message);
+        res.status(500).json({ error: 'Error al enviar notificación', message: err.message });
+    }
+});
+
 app.listen(3000, () => {
     console.log('🚀 API corriendo en http://localhost:3000/api/ranking');
     console.log('📰 Endpoint de noticias en http://localhost:3000/api/news');
+    console.log('🔔 Endpoint de notificaciones en http://localhost:3000/api/send-notification');
 });
