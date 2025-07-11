@@ -134,6 +134,24 @@ app.post('/api/send-notification', express.json(), async (req, res) => {
     }
 });
 
+// Mock helpers data
+const MOCK_HELPERS = [
+    {
+        id: '1',
+        nombre: 'Ervic Linares',
+        descripcion: 'Experto en estrategias y guías para principiantes.',
+        img: './img/char-18.png',
+        whatsapp: '+51918968939',
+        correo: 'excelgunboundggh@email.com',
+    },
+
+];
+
+// Endpoint para helpers
+app.get('/api/helpers', (req, res) => {
+    res.json(MOCK_HELPERS);
+});
+
 app.listen(3000, () => {
     console.log('🚀 API corriendo en http://localhost:3000/api/ranking');
     console.log('📰 Endpoint de noticias en http://localhost:3000/api/news');
