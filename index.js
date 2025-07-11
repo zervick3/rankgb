@@ -146,6 +146,10 @@ const MOCK_HELPERS = [
         img: '/img/char-18.png',
         whatsapp: '+51918968939',
         correo: 'excelgunboundggh@email.com',
+        especialidades: ["GP Boost", "Eventos", "guias"],
+        experiencia: 10,
+        rating: 5,
+        frase: "¡Te ayudo a subir de rango rápido!"
     },
 
 ];
