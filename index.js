@@ -7,6 +7,9 @@ const fetch = require('node-fetch');
 const app = express();
 app.use(cors());
 
+// Servir imágenes estáticas
+app.use('/img', express.static('public/img'));
+
 // Scraping del ranking
 async function fetchPage(page = 1) {
     const url = `https://gunboundggh.com/rank/EN?page=${page}`;
@@ -140,7 +143,7 @@ const MOCK_HELPERS = [
         id: '1',
         nombre: 'Ervic Linares',
         descripcion: 'Experto en estrategias y guías para principiantes.',
-        img: './img/char-18.png',
+        img: '/img/char-18.png',
         whatsapp: '+51918968939',
         correo: 'excelgunboundggh@email.com',
     },
